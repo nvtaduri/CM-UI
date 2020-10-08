@@ -14,8 +14,8 @@ services:
     environment:
       - MONGO_DB_URI=mongodb://db/microservices
 
-  books:
-    build: './books'
+  ldap:
+    build: './ldap'
     ports:
       - "3002:3000"
     depends_on: 
