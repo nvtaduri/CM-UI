@@ -16,79 +16,44 @@
 </head>
 
 <body>
-  <h1>Create books</h1>
-  <form onsubmit="return API.saveBook()">
-    <input id="bookname" type="text">
-    <input type="submit" value="submit">
+  <h1>LDAP Authenticate Service with MicroService</h1>
+  <form onsubmit="return false">
+    <input id="username" type="text">
+    <input id="password" type="password">
+    <input type="submit" value="submit" onclick="submitForm()">
   </form>
-  <h1>Create videos</h1>
-  <form onsubmit="return API.saveVideo()">
-    <input id="videoname" type="text">
-    <input type="submit" value="submit">
-  </form>
-  <h1>Search</h1>
-  <form onsubmit="return API.search()">
-    <input id="search" type="text">
-    <input type="submit" value="submit">
-  </form>
-  <ul id="matches"></ul>
+  <p id="viharibabu"></p>
   <script>
-    const API = (() => {
-      const makeSaveFunc = (selector, postNameFunc) => () => {
-        try {
-          const val = document.querySelector(selector).value;
-          postNameFunc(val);
-        } catch (e) {
-          console.log(e);
-          console.log('--------------------------');
-        }
-        return false;
-      };
+    let apiURL = "http://localhost:3000/api/v1/ldap/authenticate"
+    // Place a POST request for Authentiate
+    // Example POST method implementation:
+    async function postData(url = '', data = {}) {
+      // Default options are marked with *
+      const response = await fetch(url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+      });
+      return response.json(); // parses JSON response into native JavaScript objects
+    }
 
-      const makePostNameFunc = uri => val => {
-        fetch(uri, {
-          method: 'POST',
-          body: JSON.stringify({ name: val }),
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+    function submitForm() {
+      postData(apiURL, { username: document.getElementById("username").value, password: document.getElementById("password").value })
+        .then(data => {
+          // console.log(data); // JSON data parsed by `data.json()` call
+          if (data) {
+            document.getElementById("viharibabu").innerHTML = `welcome ${data.cn} !, your time zone is :: ${new Date()} `
           }
         });
-      };
-
-      const postVideoName = makePostNameFunc("http://192.168.1.20:8080/api/v1/ldap");
-      const postBookName = makePostNameFunc("http://192.168.1.20:8080/api/v1/ldap");
-
-      const search = () => {
-        try {
-          fetch("http://192.168.1.20:8080/api/v1/ldap")
-            .then(resp => resp.json())
-            .then(results => {
-              const ul = document.querySelector("#matches");
-              ul.innerHTML = '';
-              results.forEach(data => {
-                const li = document.createElement("li");
-                const liContent = `
-                  <p>${data.name}</p>
-                  <p>${data.type}</p>
-                `;
-                li.innerHTML = liContent;
-                ul.appendChild(li);
-              });
-            });
-        } catch (e) {
-          console.log(e);
-          console.log('--------------------------');
-        }
-        return false;
-      };
-
-      return {
-        saveVideo: makeSaveFunc("#videoname", postVideoName),
-        saveBook: makeSaveFunc("#bookname", postBookName),
-        search
-      }
-    })();
+    }
   </script>
 </body>
 

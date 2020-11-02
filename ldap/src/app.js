@@ -2,46 +2,26 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 let ldapService = require("./services/ldap.service");
-
+let routes = require("../src/routes/routes");
+var cors = require("cors");
+var whitelist = [
+  "http://localhost:4000",
+  "http://localhost:3000",
+  "http://localhost:8080",
+];
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-  let username = "aduser1";
-  let password = "Soft@AD001";
-  ad.authenticate(username, password, function (err, auth) {
-    if (err) {
-      console.log("ERROR: " + JSON.stringify(err));
-      return;
-    }
-    if (auth) {
-      console.log("Authenticated!");
-      res.json({ msg: "ldap service" });
-    } else {
-      console.log("Authentication failed!");
-    }
-  });
-});
-
-app.post("/api/v1/ldap/authenticate", async (req, res) => {
-  ldapService
-    .authenticateUser(req.body.username, req.body.password)
-    .then((response) => {
-      res.send(user);
-    });
-  // ad.authenticate(req.body.username, req.body.password, function (err, auth) {
-  //   if (err) {
-  //     console.log('ERROR: ' + JSON.stringify(err));
-  //     return;
-  //   }
-  //   if (auth) {
-  //     console.log('Authenticated!');
-  //     res.json({ success: true, msg: "User Authenticated Successfully" });
-  //   }
-  //   else {
-  //     console.log('Authentication failed!');
-  //     res.json({ success: false, msg: JSON.stringify(err) });
-  //   }
-  // });
-});
+// Routes
+app.use("/", routes);
 
 module.exports = app;
