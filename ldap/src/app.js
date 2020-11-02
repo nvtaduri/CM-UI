@@ -8,9 +8,9 @@ var whitelist = [
   "http://localhost:4000",
   "http://localhost:3000",
   "http://localhost:8080",
-  "http: //192.168.1.20:3000/",
-  "http://192.168.1.20:8080/",
-  "http://192.168.1.20:3002/",
+  "http://192.168.1.20:3000",
+  "http://192.168.1.20:8080",
+  "http://192.168.1.20:3002",
 ];
 var corsOptions = {
   origin: function (origin, callback) {
